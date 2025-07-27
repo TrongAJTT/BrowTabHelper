@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pattern URL Processor</title>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div class="container">
+    <h1 class="ext-title">Pattern URL Processor</h1>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="generate">Generate URLs</button>
+      <button class="tab-btn" data-tab="open">Open URLs</button>
+      <button class="tab-btn" data-tab="profile">Profile</button>
+    </div>
+
+    <div class="tab-content active" id="generate-tab">
+      <div class="input-group">
+        <label for="urlPattern">URL Pattern (use {id} as placeholder):</label>
+        <input type="text" id="urlPattern" class="full-width" placeholder="https://example.com/page/{id}">
+      </div>
+
+      <div class="row-group">
+        <div class="input-group">
+          <label for="startId">Start ID:</label>
+          <input type="number" id="startId" min="0">
+        </div>
+		<button class="secondary-btn input-group" id="switchBtn">🡸</button>
+        <div class="input-group">
+          <label for="endId">End ID:</label>
+          <input type="number" id="endId" min="0">
+        </div>
+      </div>
+
+      <button id="generateBtn" class="primary-btn">Generate URLs</button>
+      <button id="copyBtn" class="secondary-btn" style="display: none;">Copy</button>
+      <button id="openAllBtn" class="secondary-btn" style="display: none;">Open All</button>
+      <!-- <button id="syncOpen" class="secondary-btn">Sync Open tab</button> -->
+
+      <div class="result-container">
+        <textarea id="resultArea" class="wide-textarea full-width" readonly placeholder="Generated URLs will appear here..."></textarea>
+      </div>
+    </div>
+
+    <div class="tab-content" id="open-tab">
+      <div class="input-group">
+        <label for="urlList">URL List (one per line):</label>
+        <textarea id="urlList" placeholder="Enter URLs here or they will be loaded from generated URLs..."></textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="batchSize">Batch Size:</label>
+        <input type="number" id="batchSize" min="1" value="10" placeholder="Number of URLs to open at once">
+      </div>
+
+      <div class="button-group">
+        <button id="openBatchBtn" class="primary-btn">Open Batch</button>
+        <button id="openAllUrlsBtn" class="primary-btn">Open All URLs</button>
+        <button id="clearUrlsBtn" class="secondary-btn">Clear URLs</button>
+        <button id="cancelBatchBtn" class="secondary-btn" style="display:none;">Cancel Batch</button>
+        <button id="resetBatchDeleteBtn" class="secondary-btn" style="display:none;">Reset Batch and Delete Opened URLs</button>
+      </div>
+
+      <div class="status-container">
+        <div id="openStatus" class="status"></div>
+        <div id="progressBar" class="progress-bar">
+          <div class="progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="profile-tab">
+      <div class="profile-section">
+        <div class="profile-current">
+          <strong>Current profile:</strong> <span id="currentProfileName"></span>
+        </div>
+        <div class="profile-actions">
+          <label for="profileSelect">Switch profile:</label>
+          <select id="profileSelect"></select>
+          <button id="addProfileBtn" title="Add Profile">Add</button>
+          <button id="renameProfileBtn" title="Rename Profile">Rename</button>
+          <button id="deleteProfileBtn" title="Delete Profile">Delete</button>
+          <button id="saveProfileBtn" title="Save Profile">Save</button>
+        </div>
+        <div class="profile-io">
+          <button id="exportProfileBtn" title="Export Profile">Export</button>
+          <button id="importProfileBtn" title="Import Profile">Import</button>
+          <input type="file" id="importProfileFile" accept="application/json" style="display:none;" />
+        </div>
+      </div>
+      <div id="profileMessage" class="message"></div>
+    </div>
+
+    <div id="message" class="message"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
