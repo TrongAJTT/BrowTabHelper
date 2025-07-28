@@ -17,10 +17,6 @@ A simple browser extension to help you generate, manage, and open multiple tabs 
 - **Profile Management:**
   - Save, switch, rename, delete, import, and export profiles for different sets of URLs and settings.
 
-- **Clipboard Integration:**
-  - Press `Ctrl + Shift + V` in the popup to open all URLs from your clipboard (one per line).
-  - If clipboard access is denied, open the extension in a browser tab for permission.
-
 ## How to Use
 
 1. **Install the Extension:**
