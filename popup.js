@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const urlPatternInput = document.getElementById('urlPattern');
     const startIdInput = document.getElementById('startId');
     const endIdInput = document.getElementById('endId');
-	  const switchBtn = document.getElementById('switchBtn');
+    const switchBtn = document.getElementById('switchBtn');
     const generateBtn = document.getElementById('generateBtn');
     const copyBtn = document.getElementById('copyBtn');
     const openAllBtn = document.getElementById('openAllBtn');
@@ -152,13 +152,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize storage when popup opens
     initializeStorage();
-	
-	// Switch to new generation
-	switchBtn.addEventListener('click', () => {
-		startIdInput.value = parseInt(endIdInput.value) + 1;
-		endIdInput.value = "";
-		endIdInput.focus();
-	});
+  
+  // Switch to new generation
+  switchBtn.addEventListener('click', () => {
+    startIdInput.value = parseInt(endIdInput.value) + 1;
+    endIdInput.value = "";
+    endIdInput.focus();
+  });
 
     // Generate URLs
     generateBtn.addEventListener('click', async () => {
@@ -260,17 +260,65 @@ document.addEventListener('DOMContentLoaded', function () {
         showMessage('No URLs to open.', 'error');
         return;
       }
-  
+
       if (generatedUrls.length > 20) { // Warning for opening many tabs
-          if (!confirm(`You are about to open ${generatedUrls.length} tabs. This might slow down your browser. Continue?`)) {
-              return;
-          }
+        if (!confirm(`You are about to open ${generatedUrls.length} tabs. This might slow down your browser. Continue?`)) {
+          return;
+        }
       }
-  
+
       generatedUrls.forEach(url => {
         chrome.tabs.create({ url: url, active: false }); // active: false opens them in the background
       });
       showMessage(`Opening ${generatedUrls.length} URLs in new tabs...`, 'success');
+    });
+
+    // --- Ctrl+Shift+V: Open URLs from clipboard ---
+    document.addEventListener('keydown', async (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        try {
+          const text = await navigator.clipboard.readText();
+          if (!text) {
+            showMessage('Clipboard is empty.', 'error');
+            return;
+          }
+          // Split by line, filter valid URLs
+          const urls = text.split(/\r?\n/).map(u => u.trim()).filter(u => u && /^https?:\/\//i.test(u));
+          if (urls.length === 0) {
+            showMessage('No valid URLs found in clipboard.', 'error');
+            return;
+          }
+          if (urls.length > 20) {
+            if (!confirm(`You are about to open ${urls.length} tabs from clipboard. This might slow down your browser. Continue?`)) {
+              return;
+            }
+          }
+          // Đảm bảo extension đã sẵn sàng trước khi gửi message
+          if (!isExtensionReady) {
+            showMessage('Extension is not ready yet. Please wait a moment and try again.', 'error');
+            return;
+          }
+          chrome.runtime.sendMessage({ type: 'openTabs', urls }, (response) => {
+            if (chrome.runtime.lastError) {
+              showMessage('Failed to open tabs.', 'error');
+              console.error('Open tabs error:', chrome.runtime.lastError);
+            } else if (response && response.success) {
+              showMessage(`Opened ${urls.length} URLs from clipboard.`, 'success');
+            } else {
+              showMessage('Failed to open tabs.', 'error');
+            }
+          });
+        } catch (err) {
+          // Xử lý lỗi thiếu quyền clipboard
+          if (err && (err.name === 'NotAllowedError' || err.message?.includes('denied'))) {
+            showMessage('Không thể đọc clipboard. Hãy mở extension ở chế độ tab (bấm chuột phải vào icon extension > "Ghim vào thanh công cụ" > bấm chuột phải > "Mở trong tab mới") để cấp quyền truy cập clipboard.', 'error');
+          } else {
+            showMessage('Failed to read clipboard.', 'error');
+          }
+          console.error('Clipboard read error:', err);
+        }
+      }
     });
 
     // --- State Persistence ---
